@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/dimensionalpocket/websocket-server-js/compare/0.1.0...0.2.0) (2023-02-12)
+
+
+### Features
+
+* WebsocketConnection#close ([#4](https://github.com/dimensionalpocket/websocket-server-js/issues/4)) ([af26613](https://github.com/dimensionalpocket/websocket-server-js/commit/af2661399ad4f89ddd5a71d361203ce1d706628a))
+
 ## 0.1.0 (2023-02-12)
 
 
