@@ -39,6 +39,29 @@ describe('e2e - websocket connection', function () {
     this.clientConnection.send(m)
   })
 
+  it('receives multiple UTF8 messages from client', function (done) {
+    const messagesToSend = ['abcde👀', 'fgh 🤯 ijk', '⚠️ 12345']
+    const receivedMessages = []
+    const server = this.server
+
+    const callback = function (/** @type {any} */ _connection, /** @type {any} */ receivedMessage, /** @type {any} */ _isBinary) {
+      expect(messagesToSend).to.include(receivedMessage)
+
+      receivedMessages.push(receivedMessage)
+
+      if (messagesToSend.length === receivedMessages.length) {
+        server.removeListener('message', callback)
+        done()
+      }
+    }
+
+    server.on('message', callback)
+
+    for (var m of messagesToSend) {
+      this.clientConnection.send(m)
+    }
+  })
+
   it('sends a message to the client', function (done) {
     const m = 'message to client'
     this.clientConnection.once('message', (/** @type {any} */ message) => {
