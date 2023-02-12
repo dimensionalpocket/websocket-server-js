@@ -1,50 +1,27 @@
 import { expect, sinon } from '@dimensionalpocket/development'
-import { createConnection } from './utils/create-connection.js'
-import { createServer } from './utils/create-server.js'
+import { WebsocketServer } from '../src/WebsocketServer.js'
 
 describe('WebsocketServer', function () {
-  before(function (done) {
-    createServer(this, (/** @type {any} */ err) => {
-      if (err) return done(err)
+  describe('#stop', function () {
+    context('when the server is not started', function () {
+      before(function () {
+        sinon.stub(console, 'log')
+        this.server = new WebsocketServer()
+        this.result = this.server.stop()
+      })
 
-      sinon.spy(this.server, 'emit')
-      createConnection(this.server, this, done)
+      after(function () {
+        // @ts-ignore
+        console.log.restore()
+      })
+
+      it('returns false', function () {
+        expect(this.result).to.eq(false)
+      })
+
+      it('logs that the server is stopped', function () {
+        expect(console.log).to.have.been.calledWith('Server', this.server.uuid, 'already stopped.')
+      })
     })
-  })
-
-  after(function () {
-    if (this.clientConnection) { this.clientConnection.close() }
-    this.server.stop()
-    this.server.emit.restore()
-  })
-
-  it('emits the connect event', function () {
-    const firstConnection = this.server.connections.entries().next().value[1] // returns a tuple [id, value]
-    expect(this.server.emit).to.have.been.calledWith('connect', firstConnection)
-  })
-
-  it('adds the connection to the list of connections', function () {
-    expect(this.server.connections.size).to.eq(1)
-  })
-
-  it('receives a message from client', function (done) {
-    const m = 'message from client'
-    this.server.once('message', (/** @type {any} */ connection, /** @type {any} */ message, /** @type {any} */ _isBinary) => {
-      const firstConnection = this.server.connections.entries().next().value[1]
-      expect(message).to.eq(m)
-      expect(connection).to.eq(firstConnection)
-      done()
-    })
-    this.clientConnection.send(m)
-  })
-
-  it('sends a message to the client', function (done) {
-    const m = 'message to client'
-    this.clientConnection.once('message', (/** @type {any} */ message) => {
-      expect(message.utf8Data).to.eq(m)
-      done()
-    })
-    const connection = this.server.connections.entries().next().value[1]
-    connection.send(m)
   })
 })

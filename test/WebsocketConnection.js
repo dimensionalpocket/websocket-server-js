@@ -1,7 +1,7 @@
 import { expect, sinon } from '@dimensionalpocket/development'
+import { WebsocketConnection } from '../src/WebsocketConnection.js'
 import { createConnection } from './utils/create-connection.js'
 import { createServer } from './utils/create-server.js'
-import { WebsocketConnection } from '../src/WebsocketConnection.js'
 
 describe('WebsocketConnection', function () {
   before(function (done) {
@@ -37,7 +37,19 @@ describe('WebsocketConnection', function () {
         this.clientConnection.close()
       })
 
-      // happy tests here
+      context('without backpressure', function () {
+        before(function () {
+          sinon.stub(this.serverConnection.uwsConnection, 'send').returns(1)
+        })
+
+        after(function () {
+          this.serverConnection.uwsConnection.send.restore()
+        })
+
+        it('returns true', function () {
+          expect(this.serverConnection.send('test message without backpressure')).to.eq(true)
+        })
+      })
 
       context('when backpressure is building up', function () {
         before(function () {

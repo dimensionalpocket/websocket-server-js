@@ -76,13 +76,9 @@ export class WebsocketServer extends EventEmitter {
 
         // If not a binary message, convert it to string.
         if (!isBinary) {
-          try {
-            // @ts-ignore
-            m = decoder.write(new Uint8Array(message))
-          } catch (e) {
-            console.error('Server', this.uuid, 'Connection', connection.uuid, 'failed to decode message, error', e)
-            return
-          }
+          // @ts-ignore
+          m = decoder.write(new Uint8Array(message))
+          decoder.end() // discard incomplete characters at the end of the buffer
         }
 
         this.emit('message', connection, m, isBinary)
@@ -92,7 +88,7 @@ export class WebsocketServer extends EventEmitter {
         // @ts-ignore
         const connection = wsConnection.dpwsConnection
 
-        console.warn('Connection', connection.uuid, 'backpressure draining', wsConnection.getBufferedAmount())
+        console.warn('Server', connection.server.uuid, 'Connection', connection.uuid, 'backpressure draining', wsConnection.getBufferedAmount())
       },
 
       close: (wsConnection) => {
@@ -115,6 +111,7 @@ export class WebsocketServer extends EventEmitter {
       res
         .writeStatus('200 OK')
         .writeHeader('Access-Control-Allow-Origin', '*')
+        .writeHeader('Content-Type', 'application/json')
         .end('{"status": "OK"}')
     })
 
@@ -145,8 +142,10 @@ export class WebsocketServer extends EventEmitter {
       this._uwsSocket = null
       console.log('Server', this.uuid, 'stopped.')
       this.emit('stop', this)
-    } else {
-      console.log('Server', this.uuid, 'already stopped.')
+      return true
     }
+
+    console.log('Server', this.uuid, 'already stopped.')
+    return false
   }
 }
