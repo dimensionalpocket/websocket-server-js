@@ -8,6 +8,7 @@ Wrapper on µWebSockets.js with opinionated features.
 - Exposes the webserver on `/server`
 - Upgrades connections with UUIDs and User Agents
 - Keeps a list of connections in memory, indexed by UUIDs
+- Automatically decode non-binary messages into strings
 
 ## Usage
 
@@ -28,7 +29,7 @@ websocketServer.on('disconnect', (connection) => {
 })
 
 websocketServer.on('message', (connection, message, isBinary) => {
-  // If `isBinary` is false, then message will be a string, otherwise, an ArrayBuffer
+  // If `isBinary` is false, then message will be a string, otherwise an ArrayBuffer
   console.log('Server', connection.server.uuid, 'received message', message, 'from connection', connection.uuid)
 })
 

@@ -1,5 +1,3 @@
-'use strict'
-
 import { expect } from '@dimensionalpocket/development'
 import { WebsocketServer as WebsocketServerFromSrc } from '../src/WebsocketServer.js'
 import { Connection as ConnectionFromSrc } from '../src/Connection.js'

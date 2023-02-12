@@ -1,6 +1,6 @@
 import uWS from 'uWebSockets.js'
-import { v4 as uuidv4 } from 'uuid'
 import EventEmitter from 'eventemitter3'
+import { v4 as uuidv4 } from 'uuid'
 import { Connection } from './Connection.js'
 import { StringDecoder } from 'string_decoder'
 
@@ -31,7 +31,7 @@ export class WebsocketServer extends EventEmitter {
       compression: uWS.SHARED_COMPRESSOR,
       maxPayloadLength: 16 * 1024 * 1024,
       maxBackpressure: 1 * 1024 * 1024,
-      idleTimeout: 600, // 10 minutes - games should send messages to keep connection alive
+      idleTimeout: 600, // 10 minutes - clients should send messages periodically to keep connection alive
 
       /**
        * This is called before #open.
@@ -137,5 +137,16 @@ export class WebsocketServer extends EventEmitter {
         throw new Error(`FATAL: Server ${this.uuid} failed to listen on ${this.host}:${this.port}.`)
       }
     })
+  }
+
+  stop () {
+    if (this._uwsSocket) {
+      uWS.us_listen_socket_close(this._uwsSocket)
+      this._uwsSocket = null
+      console.log('Server', this.uuid, 'stopped.')
+      this.emit('stop', this)
+    } else {
+      console.log('Server', this.uuid, 'already stopped.')
+    }
   }
 }
