@@ -25,34 +25,34 @@ export class Connection {
   }
 
   /**
-   * Sends an object to the connection as a JSON string.
+   * Sends a string to the connection.
    *
-   * @param {any} object
+   * @param {string} message
    *
    * @returns {boolean}
    */
-  send (object) {
+  send (message) {
     if (this.active === false) {
-      console.error('Server', this.server.uuid, 'Connection', this.uuid, 'tried to send message but connection is not active', object)
+      console.error('Server', this.server.uuid, 'Connection', this.uuid, 'tried to send message but connection is not active, message:', message)
       return false
     }
 
     const uwsConnection = this.uwsConnection
 
     if (uwsConnection == null) {
-      console.error('Server', this.server.uuid, 'Connection', this.uuid, 'failed to send message due to uwsConnection not set', object)
+      console.error('Server', this.server.uuid, 'Connection', this.uuid, 'failed to send message due to uwsConnection not set, message:', message)
       return false
     }
 
-    const result = uwsConnection.send(JSON.stringify(object), false)
+    const result = uwsConnection.send(message, false)
 
     if (result === 2) {
-      console.error('Server', this.server.uuid, 'Connection', this.uuid, 'failed to send message due to backpressure limit', object)
+      console.error('Server', this.server.uuid, 'Connection', this.uuid, 'failed to send message due to backpressure limit, message:', message)
       return false
     }
 
     if (result === 0) {
-      console.warn('Server', this.server.uuid, 'Connection', this.uuid, 'is under backpressure, delivery is delayed', object)
+      console.warn('Server', this.server.uuid, 'Connection', this.uuid, 'is under backpressure, delivery will be delayed')
     }
 
     return true

@@ -43,9 +43,9 @@ websocketServer.on('stop', (server) => {
 
 websocketServer.start()
 
-// Sending an object to a connection
+// Sending a message to a connection
 const connection = websocketServer.connections.get('connection-uuid')
-connection.send({type: 'message', value: 'test'})
+connection.send('test message')
 
 ```
 
