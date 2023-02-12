@@ -7,8 +7,9 @@ const WebsocketClient = Websocket.client
 describe('WebsocketServer', function () {
   before(function (done) {
     this.server = new WebsocketServer()
-    sinon.spy(this.server, 'emit')
     this.server.port = 18888 // use another port to avoid conflict with local instances
+    sinon.spy(this.server, 'emit')
+
     this.server.once('start', () => {
       this.client = new WebsocketClient()
       this.client.on('connectFailed', (/** @type {any} */ error) => { done(error) })
@@ -27,18 +28,25 @@ describe('WebsocketServer', function () {
     this.server.stop()
   })
 
-  it('starts succesfully', function () {
+  it('emits the start event', function () {
     expect(this.server.emit).to.have.been.calledWith('start', this.server)
   })
 
-  it('adds a connection', function () {
+  it('emits the connect event', function () {
+    const firstConnection = this.server.connections.entries().next().value[1] // returns a tuple [id, value]
+    expect(this.server.emit).to.have.been.calledWith('connect', firstConnection)
+  })
+
+  it('adds the connection to the list of connections', function () {
     expect(this.server.connections.size).to.eq(1)
   })
 
   it('receives a message from client', function (done) {
     const m = 'message from client'
-    this.server.once('message', (/** @type {any} */ _connection, /** @type {any} */ message, /** @type {any} */ _isBinary) => {
+    this.server.once('message', (/** @type {any} */ connection, /** @type {any} */ message, /** @type {any} */ _isBinary) => {
+      const firstConnection = this.server.connections.entries().next().value[1]
       expect(message).to.eq(m)
+      expect(connection).to.eq(firstConnection)
       done()
     })
     this.connection.send(m)
@@ -50,7 +58,7 @@ describe('WebsocketServer', function () {
       expect(message.utf8Data).to.eq(m)
       done()
     })
-    const connection = this.server.connections.entries().next().value[1] // returns a tuple [id, value]
+    const connection = this.server.connections.entries().next().value[1]
     connection.send(m)
   })
 })
