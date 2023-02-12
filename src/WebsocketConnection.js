@@ -12,6 +12,8 @@ export class WebsocketConnection {
     this.uuid = uuidv4()
 
     /**
+     * Set by server at 'open' event.
+     *
      * @type {?uWS.WebSocket}
      */
     this.uwsConnection = null
@@ -66,6 +68,9 @@ export class WebsocketConnection {
     }
 
     uwsConnection.close()
+
+    this.uwsConnection = null
+    this.active = false
 
     return true
   }

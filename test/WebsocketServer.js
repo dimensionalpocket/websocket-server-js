@@ -13,7 +13,7 @@ describe('WebsocketServer', function () {
   })
 
   after(function () {
-    if (this.connection) { this.connection.close() }
+    if (this.clientConnection) { this.clientConnection.close() }
     this.server.stop()
     this.server.emit.restore()
   })
@@ -35,12 +35,12 @@ describe('WebsocketServer', function () {
       expect(connection).to.eq(firstConnection)
       done()
     })
-    this.connection.send(m)
+    this.clientConnection.send(m)
   })
 
   it('sends a message to the client', function (done) {
     const m = 'message to client'
-    this.connection.once('message', (/** @type {any} */ message) => {
+    this.clientConnection.once('message', (/** @type {any} */ message) => {
       expect(message.utf8Data).to.eq(m)
       done()
     })
