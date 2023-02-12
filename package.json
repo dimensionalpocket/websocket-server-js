@@ -1,7 +1,7 @@
 {
   "name": "@dimensionalpocket/websocket-server",
   "version": "0.1.0",
-  "description": "Wrapper on µWebSockets.js with opinionated features.",
+  "description": "Wrapper on µWebSockets.js with opinionated features",
   "main": "index.js",
   "type": "module",
   "scripts": {
