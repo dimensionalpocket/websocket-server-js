@@ -52,6 +52,9 @@ connection.send('test message')
 // Close the connection
 connection.close()
 
+// Stop the server, dropping all connections
+websocketServer.stop()
+
 ```
 
 ## License
