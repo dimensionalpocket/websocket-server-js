@@ -1,7 +1,7 @@
 import uWS from 'uWebSockets.js'
 import EventEmitter from 'eventemitter3'
 import { v4 as uuidv4 } from 'uuid'
-import { Connection } from './Connection.js'
+import { WebsocketConnection } from './WebsocketConnection.js'
 import { StringDecoder } from 'string_decoder'
 
 const decoder = new StringDecoder('utf8')
@@ -13,7 +13,7 @@ export class WebsocketServer extends EventEmitter {
     /** @type {string} */
     this.uuid = uuidv4()
 
-    /** @type {Map<string,Connection>} */
+    /** @type {Map<string,WebsocketConnection>} */
     this.connections = new Map()
 
     this.host = '0.0.0.0'
@@ -44,7 +44,7 @@ export class WebsocketServer extends EventEmitter {
        * @return {void}
        */
       upgrade: (res, req, context) => {
-        const dpwsConnection = new Connection(this)
+        const dpwsConnection = new WebsocketConnection(this)
         const userAgent = req.getHeader('user-agent')
         const userData = { dpwsConnection, userAgent }
 
