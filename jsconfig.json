@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "moduleResolution": "node",
+    "typeRoots": ["./node_modules/@types"],
+    "target": "es6",
+    "lib": ["es6"],
+    "downlevelIteration": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*.js",
+    "test/**/*.js",
+    "types/**/*.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
