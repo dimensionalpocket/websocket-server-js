@@ -31,7 +31,7 @@ websocketServer.on('message', (connection, message, isBinary) => {
 
 websocketServer.on('disconnect', (connection) => {
   // At this point the connection is no longer available in server.connections.get(...)
-  // The connection can no longer be used
+  // Connection can no longer be used
   console.log('Disconnected', connection.uuid, 'from server', connection.server.uuid)
 })
 
@@ -48,6 +48,9 @@ websocketServer.start()
 // Sending a message to a connection
 const connection = websocketServer.connections.get('connection-uuid')
 connection.send('test message')
+
+// Close the connection
+connection.close()
 
 ```
 

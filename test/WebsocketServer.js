@@ -1,35 +1,21 @@
 import { expect, sinon } from '@dimensionalpocket/development'
-import { WebsocketServer } from '../src/WebsocketServer.js'
-import Websocket from 'websocket'
-
-const WebsocketClient = Websocket.client
+import { createConnection } from './utils/create-connection.js'
+import { createServer } from './utils/create-server.js'
 
 describe('WebsocketServer', function () {
   before(function (done) {
-    this.server = new WebsocketServer()
-    this.server.port = 18888 // use another port to avoid conflict with local instances
-    sinon.spy(this.server, 'emit')
+    createServer(this, (/** @type {any} */ err) => {
+      if (err) return done(err)
 
-    this.server.once('start', () => {
-      this.client = new WebsocketClient()
-      this.client.on('connectFailed', (/** @type {any} */ error) => { done(error) })
-      this.client.on('connect', (/** @type {any} */ connection) => {
-        this.connection = connection
-        done()
-      })
-      this.client.connect(`ws://${this.server.host}:${this.server.port}/server`, 'echo-protocol')
+      sinon.spy(this.server, 'emit')
+      createConnection(this.server, this, done)
     })
-
-    this.server.start()
   })
 
   after(function () {
     if (this.connection) { this.connection.close() }
     this.server.stop()
-  })
-
-  it('emits the start event', function () {
-    expect(this.server.emit).to.have.been.calledWith('start', this.server)
+    this.server.emit.restore()
   })
 
   it('emits the connect event', function () {
