@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 
-export class Connection {
+export class WebsocketConnection {
   /**
    * @param {WebsocketServer} server
    */
@@ -12,12 +12,14 @@ export class Connection {
     this.uuid = uuidv4()
 
     /**
+     * Set by server at 'open' event.
+     *
      * @type {?uWS.WebSocket}
      */
     this.uwsConnection = null
 
     /**
-     * `true` if connection can transmit messages.
+     * `true` if connection is active and message transferring is possible.
      *
      * @type {boolean}
      */
@@ -54,6 +56,21 @@ export class Connection {
     if (result === 0) {
       console.warn('Server', this.server.uuid, 'Connection', this.uuid, 'is under backpressure, delivery will be delayed')
     }
+
+    return true
+  }
+
+  close () {
+    const uwsConnection = this.uwsConnection
+
+    if (uwsConnection == null) {
+      return false
+    }
+
+    uwsConnection.close()
+
+    this.uwsConnection = null
+    this.active = false
 
     return true
   }

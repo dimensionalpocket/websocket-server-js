@@ -1,2 +1,2 @@
 export { WebsocketServer } from './src/WebsocketServer.js'
-export { Connection } from './src/Connection.js'
+export { WebsocketConnection } from './src/WebsocketConnection.js'

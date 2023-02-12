@@ -24,6 +24,7 @@
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.19.0"
   },
   "devDependencies": {
+    "@dimensionalpocket/api-client": "github:dimensionalpocket/api-client-js#0.3.3",
     "@dimensionalpocket/development": "github:dimensionalpocket/development-js#1.2.0",
     "@types/uuid": "^9.0.0",
     "@types/websocket": "^1.0.5",
@@ -48,6 +49,6 @@
     ]
   },
   "engines": {
-    "node": ">= 16.14.2"
+    "node": "< 19"
   }
 }
