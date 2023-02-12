@@ -12,22 +12,24 @@ Wrapper on µWebSockets.js with opinionated features.
 ## Usage
 
 ```javascript
-import WebsocketServer from '@dimensionalpocket/websocket-server'
+import { WebsocketServer } from '@dimensionalpocket/websocket-server'
 
 const websocketServer = new WebsocketServer()
 
-websocketServer.on('connect', (connection, server) => {
+websocketServer.on('connect', (connection) => {
   // Connection is also available in server.connections.get("connection-uuid")
-  console.log('Connected', connection.uuid, 'on server', server.uuid)
+  console.log('Connected', connection.uuid, 'on server', connection.server.uuid)
 })
 
-websocketServer.on('disconnect', (connection, server) => {
+websocketServer.on('disconnect', (connection) => {
   // At this point the connection is no longer available in server.connections.get(...)
-  console.log('Disconnected', connection.uuid, 'from server', server.uuid)
+  // The connection can no longer receive messages.
+  console.log('Disconnected', connection.uuid, 'from server', connection.server.uuid)
 })
 
-websocketServer.on('message', (connection, message, isBinary, server) => {
-  console.log('Server', server.uuid, 'received message', message, 'from connection', connection.uuid)
+websocketServer.on('message', (connection, message, isBinary) => {
+  // If `isBinary` is false, then message will be a string, otherwise, an ArrayBuffer
+  console.log('Server', connection.server.uuid, 'received message', message, 'from connection', connection.uuid)
 })
 
 websocketServer.on('start', (server) => {
@@ -40,9 +42,9 @@ websocketServer.on('stop', (server) => {
 
 websocketServer.start()
 
-// Sending a message to a connection
+// Sending an object to a connection
 const connection = websocketServer.connections.get('connection-uuid')
-connection.send('message')
+connection.send({type: 'message', value: 'test'})
 
 ```
 

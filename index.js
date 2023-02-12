@@ -1,3 +1,2 @@
-import { Server } from './src/Server.js'
-
-export default Server
+export { WebsocketServer } from './src/WebsocketServer.js'
+export { Connection } from './src/Connection.js'

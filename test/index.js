@@ -1,11 +1,16 @@
 'use strict'
 
 import { expect } from '@dimensionalpocket/development'
-import { Server as ServerFromSrc } from '../src/Server.js'
-import Server from '../index.js'
+import { WebsocketServer as WebsocketServerFromSrc } from '../src/WebsocketServer.js'
+import { Connection as ConnectionFromSrc } from '../src/Connection.js'
+import { WebsocketServer, Connection } from '../index.js'
 
 describe('main require', function () {
-  it('exports Server from src', function () {
-    expect(Server).to.equal(ServerFromSrc)
+  it('exports WebsocketServer from src', function () {
+    expect(WebsocketServer).to.equal(WebsocketServerFromSrc)
+  })
+
+  it('exports Connection from src', function () {
+    expect(Connection).to.equal(ConnectionFromSrc)
   })
 })
