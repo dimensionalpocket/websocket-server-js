@@ -1,4 +1,4 @@
-# @dimensionalpocket/websocket-server-js
+# @dimensionalpocket/websocket-server
 
 [![build](https://github.com/dimensionalpocket/websocket-server-js/actions/workflows/node.js.yml/badge.svg)](https://github.com/dimensionalpocket/websocket-server-js/actions/workflows/node.js.yml)
 
