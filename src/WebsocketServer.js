@@ -91,12 +91,12 @@ export class WebsocketServer extends EventEmitter {
         console.warn('Server', connection.server.uuid, 'Connection', connection.uuid, 'backpressure draining', uwsConnection.getBufferedAmount())
       },
 
-      close: (uwsConnection) => {
+      close: (uwsConnection, code, message) => {
         // @ts-ignore
         const connection = uwsConnection.dpwsConnection
         connection.implode()
 
-        this.emit('disconnect', connection)
+        this.emit('disconnect', connection, code, message)
       }
     })
 
@@ -141,15 +141,7 @@ export class WebsocketServer extends EventEmitter {
    * @param {boolean} [compress]
    */
   publish (topic, message, isBinary = undefined, compress = undefined) {
-    const app = this._uwsApp
-
-    if (!app) {
-      console.warn('Server', this.uuid, 'tried to publish but uwsApp is not set', topic, message, isBinary, compress)
-      return false
-    }
-
-    app.publish(topic, message, isBinary, compress)
-    return true
+    this._uwsApp.publish(topic, message, isBinary, compress)
   }
 
   stop () {

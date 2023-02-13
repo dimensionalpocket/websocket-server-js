@@ -2,7 +2,7 @@ import { expect, sinon } from '@dimensionalpocket/development'
 import { createConnection } from '../utils/create-connection.js'
 import { createServer } from '../utils/create-server.js'
 
-describe('e2e - websocket connection', function () {
+describe('e2e - single connection', function () {
   before(function (done) {
     createServer(this, (/** @type {any} */ err) => {
       if (err) return done(err)
