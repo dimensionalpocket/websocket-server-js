@@ -60,6 +60,29 @@ export class WebsocketConnection {
     return true
   }
 
+  /**
+   * Subscribes this connection to a topic.
+   *
+   * @param {string} topic
+   *
+   * @returns {boolean} - `true` if subscription was successful.
+   */
+  subscribe (topic) {
+    const uwsConnection = this.uwsConnection
+
+    if (uwsConnection == null) {
+      console.error('Server', this.server.uuid, 'Connection', this.uuid, 'failed to subscribe due to uwsConnection not set, topic:', topic)
+      return false
+    }
+
+    uwsConnection.subscribe(topic)
+
+    return true
+  }
+
+  /**
+   * @returns {boolean} - `true` if connection changed from open to closed, `false` if no change happened.
+   */
   close () {
     const uwsConnection = this.uwsConnection
 
@@ -67,11 +90,28 @@ export class WebsocketConnection {
       return false
     }
 
-    uwsConnection.close()
-
-    this.uwsConnection = null
-    this.active = false
+    uwsConnection.close() // this will fire 'close' event on server, which will then implode() this connection
 
     return true
+  }
+
+  /**
+   * Removes external references to this connection
+   * to reduce GC stress.
+   */
+  implode () {
+    const uwsConnection = this.uwsConnection
+
+    if (uwsConnection) {
+      // @ts-ignore
+      uwsConnection.dpwsConnection = null
+    }
+
+    this.uwsConnection = null
+
+    // Remove self from server connections
+    this.server.connections.delete(this.uuid)
+
+    this.active = false
   }
 }
