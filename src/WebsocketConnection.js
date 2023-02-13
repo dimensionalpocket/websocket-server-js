@@ -90,16 +90,19 @@ export class WebsocketConnection {
       return false
     }
 
-    uwsConnection.close() // this will fire 'close' event on server, which will then implode() this connection
+    // Calling this will fire the 'close' event on the server,
+    // which will then call implode() on this connection.
+    uwsConnection.close()
 
     return true
   }
 
   /**
-   * Removes external references to this connection
-   * to reduce GC stress.
+   * Removes external references to this connection to reduce GC stress.
    */
   implode () {
+    this.active = false
+
     const uwsConnection = this.uwsConnection
 
     if (uwsConnection) {
@@ -111,7 +114,5 @@ export class WebsocketConnection {
 
     // Remove self from server connections
     this.server.connections.delete(this.uuid)
-
-    this.active = false
   }
 }
