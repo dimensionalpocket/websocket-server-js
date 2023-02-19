@@ -27,10 +27,6 @@ describe('WebsocketServer', function () {
         expect(this.server.emit).to.have.been.calledWith('stop', this.server)
       })
 
-      it('logs that the server has stopped', function () {
-        expect(console.log).to.have.been.calledWith('Server', this.server.uuid, 'stopped.')
-      })
-
       it('unsets the internal listen socket', function () {
         expect(this.server._uwsSocket).to.eq(null)
       })
@@ -50,10 +46,6 @@ describe('WebsocketServer', function () {
 
       it('returns false', function () {
         expect(this.result).to.eq(false)
-      })
-
-      it('logs that the server is already stopped', function () {
-        expect(console.log).to.have.been.calledWith('Server', this.server.uuid, 'already stopped.')
       })
     })
   })

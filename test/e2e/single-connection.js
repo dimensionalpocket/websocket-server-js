@@ -28,7 +28,7 @@ describe('e2e - single connection', function () {
   })
 
   it('receives a message from client', function (done) {
-    const m = 'message from client'
+    const m = 'test-client-message'
     this.server.once('message', (/** @type {any} */ connection, /** @type {any} */ message, /** @type {any} */ _isBinary) => {
       const firstConnection = this.server.connections.entries().next().value[1]
       expect(message).to.eq(m)

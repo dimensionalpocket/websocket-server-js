@@ -17,7 +17,13 @@ export class WebsocketServer extends EventEmitter {
     this.connections = new Map()
 
     this.host = '0.0.0.0'
-    this.port = process.env.PORT || 8888
+
+    const portFromEnv = process.env.PORT
+
+    /**
+     * @type {number}
+     */
+    this.port = portFromEnv ? parseInt(portFromEnv, 10) : 8888
 
     /**
      * @private
@@ -87,8 +93,7 @@ export class WebsocketServer extends EventEmitter {
       drain: (uwsConnection) => {
         // @ts-ignore
         const connection = uwsConnection.dpwsConnection
-
-        console.warn('Server', connection.server.uuid, 'Connection', connection.uuid, 'backpressure draining', uwsConnection.getBufferedAmount())
+        this.emit('drain', connection, uwsConnection.getBufferedAmount())
       },
 
       close: (uwsConnection, code, message) => {
@@ -102,13 +107,13 @@ export class WebsocketServer extends EventEmitter {
 
     // Status endpoint for health checks and kickstarts.
     this._uwsApp.get('/', (res) => {
-      console.log('Server', this.uuid, 'STATUS')
-
       res
         .writeStatus('200 OK')
         .writeHeader('Access-Control-Allow-Origin', '*')
         .writeHeader('Content-Type', 'application/json')
         .end('{"status": "OK"}')
+
+      this.emit('status', this)
     })
 
     /**
@@ -124,7 +129,6 @@ export class WebsocketServer extends EventEmitter {
     this._uwsApp.listen(this.host, +this.port, socket => {
       if (socket) {
         this._uwsSocket = socket
-        console.log('Server', this.uuid, 'started and listening on', this.host, this.port)
         this.emit('start', this)
       } else {
         throw new Error(`FATAL: Server ${this.uuid} failed to listen on ${this.host}:${this.port}.`)
@@ -148,12 +152,11 @@ export class WebsocketServer extends EventEmitter {
     if (this._uwsSocket) {
       uWS.us_listen_socket_close(this._uwsSocket)
       this._uwsSocket = null
-      console.log('Server', this.uuid, 'stopped.')
       this.emit('stop', this)
       return true
     }
 
-    console.log('Server', this.uuid, 'already stopped.')
+    console.warn('Server#stop', this.uuid, 'already stopped.')
     return false
   }
 }

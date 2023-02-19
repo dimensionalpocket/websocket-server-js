@@ -16,6 +16,30 @@ export function createServer (context, done) {
   context.server.port = nextPort++
   context.server.once('start', () => done())
 
+  context.server.on('start', (/** @type {WebsocketServer} */ server) => {
+    console.log('Server', server.uuid, 'started and listening on', server.host, server.port)
+  })
+
+  context.server.on('connect', (/** @type {WebsocketConnection} */ connection) => {
+    console.log('Server', connection.server.uuid, 'received connection', connection.uuid)
+  })
+
+  context.server.on('message', (/** @type {WebsocketConnection} */ connection, /** @type {any} */ message, /** @type {boolean} */ isBinary) => {
+    console.log('Server', connection.server.uuid, 'received message', message, isBinary)
+  })
+
+  context.server.on('stop', (/** @type {WebsocketServer} */ server) => {
+    console.log('Server', server.uuid, 'stopped.')
+  })
+
+  context.server.on('status', (/** @type {WebsocketServer} */ server) => {
+    console.log('Server', server.uuid, 'STATUS')
+  })
+
+  context.server.on('drain', (/** @type {WebsocketConnection} */ connection, /** @type {number} */ bufferedAmount) => {
+    console.warn('Server', connection.server.uuid, 'Connection', connection.uuid, 'backpressure draining', bufferedAmount)
+  })
+
   try {
     context.server.start()
   } catch (e) {
