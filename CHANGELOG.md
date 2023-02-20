@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/dimensionalpocket/websocket-server-js/compare/0.2.0...0.3.0) (2023-02-20)
+
+
+### Features
+
+* PubSub support ([#6](https://github.com/dimensionalpocket/websocket-server-js/issues/6)) ([eefd90f](https://github.com/dimensionalpocket/websocket-server-js/commit/eefd90f6de656f927b37e3615a7955ea1b798fed))
+
 ## [0.2.0](https://github.com/dimensionalpocket/websocket-server-js/compare/0.1.0...0.2.0) (2023-02-12)
 
 
