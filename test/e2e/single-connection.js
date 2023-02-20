@@ -1,6 +1,6 @@
 import { expect, sinon } from '@dimensionalpocket/development'
-import { createConnection } from '../utils/create-connection.js'
-import { createServer } from '../utils/create-server.js'
+import { createConnection } from '../support/create-connection.js'
+import { createServer } from '../support/create-server.js'
 
 describe('e2e - single connection', function () {
   before(function (done) {

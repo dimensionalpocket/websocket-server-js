@@ -1,6 +1,6 @@
 import ApiClient from '@dimensionalpocket/api-client'
 import { expect, sinon } from '@dimensionalpocket/development'
-import { createServer } from '../utils/create-server.js'
+import { createServer } from '../support/create-server.js'
 
 describe('e2e - GET /', function () {
   before(function (done) {

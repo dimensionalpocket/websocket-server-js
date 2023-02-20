@@ -1,6 +1,6 @@
 import { expect, sinon } from '@dimensionalpocket/development'
 import { WebsocketServer } from '../src/WebsocketServer.js'
-import { createServer } from './utils/create-server.js'
+import { createServer } from './support/create-server.js'
 
 describe('WebsocketServer', function () {
   describe('#stop', function () {
