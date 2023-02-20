@@ -60,6 +60,39 @@ export class WebsocketConnection {
     return true
   }
 
+  /**
+   * Sends an object as JSON string to the connection.
+   *
+   * @param {object} object
+   * @returns {boolean}
+   */
+  json (object) {
+    return this.send(JSON.stringify(object))
+  }
+
+  /**
+   * Subscribes this connection to a topic.
+   *
+   * @param {string} topic
+   *
+   * @returns {boolean} - `true` if subscription was successful.
+   */
+  subscribe (topic) {
+    const uwsConnection = this.uwsConnection
+
+    if (uwsConnection == null) {
+      console.error('Server', this.server.uuid, 'Connection', this.uuid, 'failed to subscribe due to uwsConnection not set, topic:', topic)
+      return false
+    }
+
+    uwsConnection.subscribe(topic)
+
+    return true
+  }
+
+  /**
+   * @returns {boolean} - `true` if connection changed from open to closed, `false` if no change happened.
+   */
   close () {
     const uwsConnection = this.uwsConnection
 
@@ -67,11 +100,29 @@ export class WebsocketConnection {
       return false
     }
 
+    // Calling this will fire the 'close' event on the server,
+    // which will then call implode() on this connection.
     uwsConnection.close()
 
-    this.uwsConnection = null
+    return true
+  }
+
+  /**
+   * Removes external references to this connection to reduce GC stress.
+   */
+  implode () {
     this.active = false
 
-    return true
+    const uwsConnection = this.uwsConnection
+
+    if (uwsConnection) {
+      // @ts-ignore
+      uwsConnection.dpwsConnection = null
+    }
+
+    this.uwsConnection = null
+
+    // Remove self from server connections
+    this.server.connections.delete(this.uuid)
   }
 }

@@ -1,7 +1,7 @@
 import { expect, sinon } from '@dimensionalpocket/development'
 import { WebsocketConnection } from '../src/WebsocketConnection.js'
-import { createConnection } from './utils/create-connection.js'
-import { createServer } from './utils/create-server.js'
+import { createConnection } from './support/create-connection.js'
+import { createServer } from './support/create-server.js'
 
 describe('WebsocketConnection', function () {
   before(function (done) {

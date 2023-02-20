@@ -1,9 +1,8 @@
-import ApiClient from '@dimensionalpocket/api-client'
 import { expect, sinon } from '@dimensionalpocket/development'
-import { createConnection } from './utils/create-connection.js'
-import { createServer } from './utils/create-server.js'
+import { createConnection } from '../support/create-connection.js'
+import { createServer } from '../support/create-server.js'
 
-describe('e2e - websocket connection', function () {
+describe('e2e - single connection', function () {
   before(function (done) {
     createServer(this, (/** @type {any} */ err) => {
       if (err) return done(err)
@@ -20,8 +19,9 @@ describe('e2e - websocket connection', function () {
   })
 
   it('emits the connect event', function () {
-    const firstConnection = this.server.connections.entries().next().value[1] // returns a tuple [id, value]
-    expect(this.server.emit).to.have.been.calledWith('connect', firstConnection)
+    const serverConnection = this.server.connections.get(this.clientConnection.connectionUuid)
+
+    expect(this.server.emit).to.have.been.calledWith('connect', serverConnection)
   })
 
   it('adds the connection to the list of connections', function () {
@@ -29,11 +29,11 @@ describe('e2e - websocket connection', function () {
   })
 
   it('receives a message from client', function (done) {
-    const m = 'message from client'
+    const m = 'test-client-message'
+    const serverConnection = this.server.connections.get(this.clientConnection.connectionUuid)
     this.server.once('message', (/** @type {any} */ connection, /** @type {any} */ message, /** @type {any} */ _isBinary) => {
-      const firstConnection = this.server.connections.entries().next().value[1]
       expect(message).to.eq(m)
-      expect(connection).to.eq(firstConnection)
+      expect(connection).to.eq(serverConnection)
       done()
     })
     this.clientConnection.send(m)
@@ -70,47 +70,5 @@ describe('e2e - websocket connection', function () {
     })
     const connection = this.server.connections.entries().next().value[1]
     connection.send(m)
-  })
-})
-
-describe('e2e - GET /', function () {
-  before(function (done) {
-    sinon.stub(console, 'log')
-
-    createServer(this, (/** @type {any} */ err) => {
-      if (err) return done(err)
-
-      this.apiClient = new ApiClient(`http://${this.server.host}:${this.server.port}`)
-      this.apiClient.returnBody = false
-      this.apiClient.get('/').then((/** @type {any} */ response) => {
-        this.response = response
-        this.server.stop()
-        done()
-      })
-    })
-  })
-
-  after(function () {
-    // @ts-ignore
-    console.log.restore()
-  })
-
-  it('returns status code 200', function () {
-    expect(this.response.status).to.eq(200)
-  })
-
-  it('logs the request', function () {
-    expect(console.log).to.have.been.calledWith('Server', this.server.uuid, 'STATUS')
-  })
-
-  it('responds with permissive CORS headers', function () {
-    expect(this.response.headers['access-control-allow-origin']).to.eq('*')
-  })
-
-  it('returns a valid JSON response', function () {
-    expect(this.response.headers['content-type']).to.eq('application/json')
-
-    const body = this.response.data
-    expect(body.status).to.eq('OK')
   })
 })

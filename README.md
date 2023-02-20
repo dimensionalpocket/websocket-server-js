@@ -29,10 +29,10 @@ websocketServer.on('message', (connection, message, isBinary) => {
   console.log('Server', connection.server.uuid, 'received message', message, 'from connection', connection.uuid)
 })
 
-websocketServer.on('disconnect', (connection) => {
+websocketServer.on('disconnect', (connection, code, message) => {
   // At this point the connection is no longer available in server.connections.get(...)
   // Connection can no longer be used
-  console.log('Disconnected', connection.uuid, 'from server', connection.server.uuid)
+  console.log('Disconnected', connection.uuid, 'from server', connection.server.uuid, code, message)
 })
 
 websocketServer.on('start', (server) => {
@@ -49,12 +49,17 @@ websocketServer.start()
 const connection = websocketServer.connections.get('connection-uuid')
 connection.send('test message')
 
+// Subscribe to a topic
+connection.subscribe('some-topic')
+
+// Broadcast to a topic
+websocketServer.publish('some-topic', 'some message')
+
 // Close the connection
 connection.close()
 
 // Stop the server, dropping all connections
 websocketServer.stop()
-
 ```
 
 ## License

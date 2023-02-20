@@ -17,7 +17,13 @@ export class WebsocketServer extends EventEmitter {
     this.connections = new Map()
 
     this.host = '0.0.0.0'
-    this.port = process.env.PORT || 8888
+
+    const portFromEnv = process.env.PORT
+
+    /**
+     * @type {number}
+     */
+    this.port = portFromEnv ? parseInt(portFromEnv, 10) : 8888
 
     /**
      * @private
@@ -57,20 +63,20 @@ export class WebsocketServer extends EventEmitter {
         )
       },
 
-      open: (wsConnection) => {
+      open: (uwsConnection) => {
         // @ts-ignore
-        const connection = wsConnection.dpwsConnection
+        const connection = uwsConnection.dpwsConnection
 
-        connection.uwsConnection = wsConnection
+        connection.uwsConnection = uwsConnection
         connection.active = true
         this.connections.set(connection.uuid, connection)
 
         this.emit('connect', connection)
       },
 
-      message: (wsConnection, message, isBinary) => {
+      message: (uwsConnection, message, isBinary) => {
         // @ts-ignore
-        const connection = wsConnection.dpwsConnection
+        const connection = uwsConnection.dpwsConnection
 
         let m = message
 
@@ -84,35 +90,30 @@ export class WebsocketServer extends EventEmitter {
         this.emit('message', connection, m, isBinary)
       },
 
-      drain: (wsConnection) => {
+      drain: (uwsConnection) => {
         // @ts-ignore
-        const connection = wsConnection.dpwsConnection
-
-        console.warn('Server', connection.server.uuid, 'Connection', connection.uuid, 'backpressure draining', wsConnection.getBufferedAmount())
+        const connection = uwsConnection.dpwsConnection
+        this.emit('drain', connection, uwsConnection.getBufferedAmount())
       },
 
-      close: (wsConnection) => {
+      close: (uwsConnection, code, message) => {
         // @ts-ignore
-        const connection = wsConnection.dpwsConnection
+        const connection = uwsConnection.dpwsConnection
+        connection.implode()
 
-        connection.active = false
-        connection.uwsConnection = null
-
-        this.connections.delete(connection.uuid)
-
-        this.emit('disconnect', connection)
+        this.emit('disconnect', connection, code, message)
       }
     })
 
     // Status endpoint for health checks and kickstarts.
     this._uwsApp.get('/', (res) => {
-      console.log('Server', this.uuid, 'STATUS')
-
       res
         .writeStatus('200 OK')
         .writeHeader('Access-Control-Allow-Origin', '*')
         .writeHeader('Content-Type', 'application/json')
         .end('{"status": "OK"}')
+
+      this.emit('status', this)
     })
 
     /**
@@ -128,7 +129,6 @@ export class WebsocketServer extends EventEmitter {
     this._uwsApp.listen(this.host, +this.port, socket => {
       if (socket) {
         this._uwsSocket = socket
-        console.log('Server', this.uuid, 'started and listening on', this.host, this.port)
         this.emit('start', this)
       } else {
         throw new Error(`FATAL: Server ${this.uuid} failed to listen on ${this.host}:${this.port}.`)
@@ -136,16 +136,27 @@ export class WebsocketServer extends EventEmitter {
     })
   }
 
+  /**
+   * Publish a message to a topic, to be sent to all connections subscribed to it.
+   *
+   * @param {string} topic
+   * @param {ArrayBuffer|string} message
+   * @param {boolean} [isBinary]
+   * @param {boolean} [compress]
+   */
+  publish (topic, message, isBinary = undefined, compress = undefined) {
+    this._uwsApp.publish(topic, message, isBinary, compress)
+  }
+
   stop () {
     if (this._uwsSocket) {
       uWS.us_listen_socket_close(this._uwsSocket)
       this._uwsSocket = null
-      console.log('Server', this.uuid, 'stopped.')
       this.emit('stop', this)
       return true
     }
 
-    console.log('Server', this.uuid, 'already stopped.')
+    console.warn('Server#stop', this.uuid, 'already stopped.')
     return false
   }
 }
