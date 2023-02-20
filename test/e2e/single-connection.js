@@ -19,8 +19,9 @@ describe('e2e - single connection', function () {
   })
 
   it('emits the connect event', function () {
-    const firstConnection = this.server.connections.entries().next().value[1] // returns a tuple [id, value]
-    expect(this.server.emit).to.have.been.calledWith('connect', firstConnection)
+    const serverConnection = this.server.connections.get(this.clientConnection.connectionUuid)
+
+    expect(this.server.emit).to.have.been.calledWith('connect', serverConnection)
   })
 
   it('adds the connection to the list of connections', function () {
@@ -29,10 +30,10 @@ describe('e2e - single connection', function () {
 
   it('receives a message from client', function (done) {
     const m = 'test-client-message'
+    const serverConnection = this.server.connections.get(this.clientConnection.connectionUuid)
     this.server.once('message', (/** @type {any} */ connection, /** @type {any} */ message, /** @type {any} */ _isBinary) => {
-      const firstConnection = this.server.connections.entries().next().value[1]
       expect(message).to.eq(m)
-      expect(connection).to.eq(firstConnection)
+      expect(connection).to.eq(serverConnection)
       done()
     })
     this.clientConnection.send(m)

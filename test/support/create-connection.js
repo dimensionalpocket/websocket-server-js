@@ -11,11 +11,20 @@ const WebsocketClient = Websocket.client
 */
 export function createConnection (server, context, done) {
   context.client = new WebsocketClient()
+
+  // These events are based on the ws library.
   context.client.on('connectFailed', (/** @type {any} */ error) => { done(error) })
   context.client.on('connect', (/** @type {any} */ connection) => {
     context.clientConnection = connection
-    // Give the server a moment to get the connection set up
-    setTimeout(() => done(), 10)
+    connection.once('message', (/** @type {any} */ data) => {
+      // First message sent by server will be the connection UUID
+      const json = JSON.parse(data.utf8Data)
+      if (json && json[0] === 'connection-uuid') {
+        context.clientConnection.connectionUuid = json[1]
+      }
+      done()
+    })
   })
+
   context.client.connect(`ws://${server.host}:${server.port}/server`, 'echo-protocol')
 }

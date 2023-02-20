@@ -22,6 +22,7 @@ export function createServer (context, done) {
 
   context.server.on('connect', (/** @type {WebsocketConnection} */ connection) => {
     console.log('Server', connection.server.uuid, 'received connection', connection.uuid)
+    connection.json(['connection-uuid', connection.uuid])
   })
 
   context.server.on('message', (/** @type {WebsocketConnection} */ connection, /** @type {any} */ message, /** @type {boolean} */ isBinary) => {

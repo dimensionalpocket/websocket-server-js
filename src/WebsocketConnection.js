@@ -61,6 +61,16 @@ export class WebsocketConnection {
   }
 
   /**
+   * Sends an object as JSON string to the connection.
+   *
+   * @param {object} object
+   * @returns {boolean}
+   */
+  json (object) {
+    return this.send(JSON.stringify(object))
+  }
+
+  /**
    * Subscribes this connection to a topic.
    *
    * @param {string} topic
