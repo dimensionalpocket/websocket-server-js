@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/dimensionalpocket/websocket-server-js#readme",
   "dependencies": {
-    "eventemitter3": "5.0.0",
+    "eventemitter3": "5.0.1",
     "uuid": "9.0.0",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.19.0"
   },
