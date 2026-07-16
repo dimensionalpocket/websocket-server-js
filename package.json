@@ -21,7 +21,7 @@
   "dependencies": {
     "eventemitter3": "5.0.0",
     "uuid": "9.0.0",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.19.0"
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.69.0"
   },
   "devDependencies": {
     "@dimensionalpocket/api-client": "github:dimensionalpocket/api-client-js#0.3.3",
